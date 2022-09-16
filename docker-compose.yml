@@ -1,17 +1,18 @@
 services:
-#-----------------------------------------------------------------
+  #-----------------------------------------------------------------
   mysql-server:
     image: mysql:latest
     container_name: mysql-sample
-    ports: 
-      - 13306:3306
+    ports:
+      - 3306:3306
     volumes:
+      - db:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
+      MYSQL_DATABASE: "sample"
       MYSQL_ROOT_PASSWORD: "P@ssw0rd"
-    env_file: ./.env
 
-#-----------------------------------------------------------------
+  #-----------------------------------------------------------------
   sample:
     build:
       context: .
@@ -24,5 +25,8 @@ services:
     restart: always
     depends_on:
       - mysql-server
-    env_file: ./.env
-    entrypoint: ["/app/main"]
+    entrypoint: [ "/app/main" ]
+
+volumes:
+  db:
+    driver: local

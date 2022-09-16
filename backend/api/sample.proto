@@ -5,5 +5,13 @@ package agentdash.nitrogen;
 option go_package = "github.com/nttv2709/sample_shecodes2022";
 
 service SampleService {
-    
+    rpc SayHello(Request) returns (Reply) {}
+}
+
+message Request {
+    string msg = 1;
+}
+
+message Reply {
+    string nMsg = 1;
 }

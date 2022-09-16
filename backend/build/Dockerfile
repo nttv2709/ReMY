@@ -7,7 +7,6 @@ FROM alpine:3.16
 WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY .env .
 
 COPY wait-for-mysql.sh /wait-for-mysql.sh
 RUN chmod +x /wait-for-mysql.sh
