@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package agentdash.nitrogen;
+
+option go_package = "github.com/nttv2709/sample_shecodes2022";
+
+service SampleService {
+    
+}

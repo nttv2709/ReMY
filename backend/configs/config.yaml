@@ -1,0 +1,19 @@
+listener:
+  tcp:
+    address: 0.0.0.0
+    port: 8080
+    secure: false
+
+logger:
+  pretty: true
+  level: DEBUG
+  
+database:
+  auth_method: ${DATABASE_AUTH_METHOD} # DATABASE_AUTH_METHOD_AWS_IAM
+  host: ${DATABASE_HOST}
+  port: 3306
+  database_name: ${DATABASE_NAME}
+  username: ${DATABASE_USERNAME}
+  password: ${DATABASE_PASSWORD}
+  tracing_enabled: false
+  debug: false
