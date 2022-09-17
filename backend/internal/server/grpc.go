@@ -6,17 +6,22 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	api "remy/api/pb"
 	"remy/internal/constants"
 	"remy/internal/database"
+	"remy/internal/transformer"
 	"remy/pkg/ent"
+	"remy/pkg/ent/event"
 
+	"entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Server struct {
@@ -54,6 +59,7 @@ func NewServer(ent *ent.Client) (*Server, error) {
 
 	return &Server{
 		logger: logger,
+		ent:    ent,
 	}, nil
 }
 
@@ -62,6 +68,70 @@ func (s *Server) Close() {
 }
 
 func (s *Server) CreateEvent(ctx context.Context, request *api.CreateEventRequest) (*api.CreateEventReply, error) {
+	// return nil, nil
+	log.Println("Request: ", request)
+	event, err := s.ent.Event.Create().SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateEventReply{
+		Id: event.ID,
+	}, nil
+}
+
+func (s *Server) DeleteEvent(ctx context.Context, request *api.DeleteEventRequest) (*api.DeleteEventReply, error) {
+	err := s.ent.Event.DeleteOneID(request.Id).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &api.DeleteEventReply{}, nil
+}
+
+func (s *Server) UpdateEvent(ctx context.Context, request *api.UpdateEventRequest) (*api.UpdateEventReply, error) {
+	_, err := s.ent.Event.Update().SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &api.UpdateEventReply{}, nil
+}
+
+func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest) (*api.ListEventsReply, error) {
+	query := s.ent.Debug().Event.Query().Where()
+	var date_type string
+	switch *&request.DateType {
+	case api.ListEventsRequest_DAY:
+		date_type = "DATE"
+	case api.ListEventsRequest_MONTH:
+		date_type = "MONTH"
+	case api.ListEventsRequest_YEAR:
+		date_type = "YEAR"
+	}
+	var type_date []struct {
+		Start time.Time
+	}
+	err := query.Modify(func(s *sql.Selector) {
+		s.Select(fmt.Sprintf("DATE(%s)", event.FieldStart)).GroupBy(fmt.Sprintf("%s(%s)", date_type, event.FieldStart))
+	}).Scan(ctx, &type_date)
+	if err != nil {
+		return nil, err
+	}
+	var res []*api.ListEvents
+	for _, item := range type_date {
+		events := query.Where(func(s *sql.Selector) {
+			sql.EQ(fmt.Sprintf("%s(%s)", date_type, event.FieldStart), item)
+		}).AllX(ctx)
+		res = append(res, &api.ListEvents{
+			Event: transformer.EventsToMessage(events),
+			Time:  timestamppb.New(item.Start),
+		})
+	}
+
+	return &api.ListEventsReply{
+		ListEvents: res,
+	}, nil
+}
+
+func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (*api.GetRemindReply, error) {
 	return nil, nil
 }
 
@@ -71,7 +141,7 @@ func RunGRPC() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	
+
 	db, err := database.Init()
 	if err != nil {
 		log.Println(err)
