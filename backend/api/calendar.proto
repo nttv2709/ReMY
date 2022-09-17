@@ -9,6 +9,7 @@ service CalendarService {
     rpc CreateEvent(CreateEventRequest) returns (CreateEventReply) {}
     rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventReply) {}
     rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventReply) {} 
+    rpc ListEvents(ListEventsRequest) returns (ListEventsReply) {}
     rpc GetRemind(GetRemindRequest) returns (GetRemindReply) {}
 }
 
@@ -36,6 +37,21 @@ message CreateEventRequest {
 
 message CreateEventReply {
     int64 id = 1;
+}
+
+message ListEventsRequest {
+    RangeTime range_time = 1;
+    DATE_TYPE date_type = 2;
+
+    enum DATE_TYPE {
+        DAY = 0;
+        MONTH = 1;
+        YEAR = 2;
+    }
+}
+
+message ListEventsReply {
+    repeated ListEvents list_events = 1;
 }
 
 message GetRemindRequest {
