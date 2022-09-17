@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "moment": "^2.29.4",
+    "react-calendar": "^3.8.0",
+    "react-native-add-calendar-event": "^4.0.0"
+  }
+}
