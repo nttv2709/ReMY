@@ -4,11 +4,11 @@ package enttest
 
 import (
 	"context"
-	"sample_shecodes2022/pkg/ent"
+	"remy/pkg/ent"
 	// required by schema hooks.
-	_ "sample_shecodes2022/pkg/ent/runtime"
+	_ "remy/pkg/ent/runtime"
 
-	"sample_shecodes2022/pkg/ent/migrate"
+	"remy/pkg/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

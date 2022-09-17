@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in sample_shecodes2022/pkg/ent/runtime.go
+// The schema-stitching logic is generated in remy/pkg/ent/runtime.go
 
 const (
 	Version = "v0.11.2"                                         // Version of ent codegen.

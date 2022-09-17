@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"log"
 
-	"sample_shecodes2022/pkg/ent/migrate"
+	"remy/pkg/ent/migrate"
 
-	"sample_shecodes2022/pkg/ent/player"
+	"remy/pkg/ent/event"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -21,8 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Player is the client for interacting with the Player builders.
-	Player *PlayerClient
+	// Event is the client for interacting with the Event builders.
+	Event *EventClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,7 +36,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Player = NewPlayerClient(c.config)
+	c.Event = NewEventClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -70,7 +70,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
-		Player: NewPlayerClient(cfg),
+		Event:  NewEventClient(cfg),
 	}, nil
 }
 
@@ -90,14 +90,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
-		Player: NewPlayerClient(cfg),
+		Event:  NewEventClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Player.
+//		Event.
 //		Query().
 //		Count(ctx)
 //
@@ -120,87 +120,87 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Player.Use(hooks...)
+	c.Event.Use(hooks...)
 }
 
-// PlayerClient is a client for the Player schema.
-type PlayerClient struct {
+// EventClient is a client for the Event schema.
+type EventClient struct {
 	config
 }
 
-// NewPlayerClient returns a client for the Player from the given config.
-func NewPlayerClient(c config) *PlayerClient {
-	return &PlayerClient{config: c}
+// NewEventClient returns a client for the Event from the given config.
+func NewEventClient(c config) *EventClient {
+	return &EventClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `player.Hooks(f(g(h())))`.
-func (c *PlayerClient) Use(hooks ...Hook) {
-	c.hooks.Player = append(c.hooks.Player, hooks...)
+// A call to `Use(f, g, h)` equals to `event.Hooks(f(g(h())))`.
+func (c *EventClient) Use(hooks ...Hook) {
+	c.hooks.Event = append(c.hooks.Event, hooks...)
 }
 
-// Create returns a builder for creating a Player entity.
-func (c *PlayerClient) Create() *PlayerCreate {
-	mutation := newPlayerMutation(c.config, OpCreate)
-	return &PlayerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Event entity.
+func (c *EventClient) Create() *EventCreate {
+	mutation := newEventMutation(c.config, OpCreate)
+	return &EventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Player entities.
-func (c *PlayerClient) CreateBulk(builders ...*PlayerCreate) *PlayerCreateBulk {
-	return &PlayerCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Event entities.
+func (c *EventClient) CreateBulk(builders ...*EventCreate) *EventCreateBulk {
+	return &EventCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Player.
-func (c *PlayerClient) Update() *PlayerUpdate {
-	mutation := newPlayerMutation(c.config, OpUpdate)
-	return &PlayerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Event.
+func (c *EventClient) Update() *EventUpdate {
+	mutation := newEventMutation(c.config, OpUpdate)
+	return &EventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *PlayerClient) UpdateOne(pl *Player) *PlayerUpdateOne {
-	mutation := newPlayerMutation(c.config, OpUpdateOne, withPlayer(pl))
-	return &PlayerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventClient) UpdateOne(e *Event) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEvent(e))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *PlayerClient) UpdateOneID(id int) *PlayerUpdateOne {
-	mutation := newPlayerMutation(c.config, OpUpdateOne, withPlayerID(id))
-	return &PlayerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventClient) UpdateOneID(id int64) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEventID(id))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Player.
-func (c *PlayerClient) Delete() *PlayerDelete {
-	mutation := newPlayerMutation(c.config, OpDelete)
-	return &PlayerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Event.
+func (c *EventClient) Delete() *EventDelete {
+	mutation := newEventMutation(c.config, OpDelete)
+	return &EventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *PlayerClient) DeleteOne(pl *Player) *PlayerDeleteOne {
-	return c.DeleteOneID(pl.ID)
+func (c *EventClient) DeleteOne(e *Event) *EventDeleteOne {
+	return c.DeleteOneID(e.ID)
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *PlayerClient) DeleteOneID(id int) *PlayerDeleteOne {
-	builder := c.Delete().Where(player.ID(id))
+func (c *EventClient) DeleteOneID(id int64) *EventDeleteOne {
+	builder := c.Delete().Where(event.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &PlayerDeleteOne{builder}
+	return &EventDeleteOne{builder}
 }
 
-// Query returns a query builder for Player.
-func (c *PlayerClient) Query() *PlayerQuery {
-	return &PlayerQuery{
+// Query returns a query builder for Event.
+func (c *EventClient) Query() *EventQuery {
+	return &EventQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a Player entity by its id.
-func (c *PlayerClient) Get(ctx context.Context, id int) (*Player, error) {
-	return c.Query().Where(player.ID(id)).Only(ctx)
+// Get returns a Event entity by its id.
+func (c *EventClient) Get(ctx context.Context, id int64) (*Event, error) {
+	return c.Query().Where(event.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *PlayerClient) GetX(ctx context.Context, id int) *Player {
+func (c *EventClient) GetX(ctx context.Context, id int64) *Event {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -209,6 +209,6 @@ func (c *PlayerClient) GetX(ctx context.Context, id int) *Player {
 }
 
 // Hooks returns the client hooks.
-func (c *PlayerClient) Hooks() []Hook {
-	return c.hooks.Player
+func (c *EventClient) Hooks() []Hook {
+	return c.hooks.Event
 }

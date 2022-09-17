@@ -5,18 +5,18 @@ package hook
 import (
 	"context"
 	"fmt"
-	"sample_shecodes2022/pkg/ent"
+	"remy/pkg/ent"
 )
 
-// The PlayerFunc type is an adapter to allow the use of ordinary
-// function as Player mutator.
-type PlayerFunc func(context.Context, *ent.PlayerMutation) (ent.Value, error)
+// The EventFunc type is an adapter to allow the use of ordinary
+// function as Event mutator.
+type EventFunc func(context.Context, *ent.EventMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f PlayerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.PlayerMutation)
+func (f EventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.EventMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PlayerMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventMutation", m)
 	}
 	return f(ctx, mv)
 }

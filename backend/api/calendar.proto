@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "github.com/nttv2709/sample_shecodes2022";
+import "google/protobuf/timestamp.proto";
+
+service CalendarService {
+    rpc CreateEvent(CreateEventRequest) returns (CreateEventReply) {}
+    rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventReply) {}
+    rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventReply) {} 
+    rpc GetRemind(GetRemindRequest) returns (GetRemindReply) {}
+}
+
+message RangeTime {
+    google.protobuf.Timestamp start = 1;
+    google.protobuf.Timestamp end = 2;
+}
+
+message Event {
+    int64 id = 1;
+    string title = 2;
+    RangeTime range_time = 3;
+}
+
+message ListEvents {
+    repeated Event event = 1;
+    google.protobuf.Timestamp time = 2;
+}
+
+message CreateEventRequest {
+    string title = 1;
+    RangeTime range_time = 2;
+    // google.protobuf.SourceCodeInfo.Location location = 3;
+}
+
+message CreateEventReply {
+    int64 id = 1;
+}
+
+message GetRemindRequest {
+    RangeTime range_time = 1;
+}
+
+message GetRemindReply {
+    repeated ListEvents list_events = 1;
+}
+
+message UpdateEventRequest {
+    int64 id = 1;
+    string title = 2;
+    RangeTime range_time = 3;
+}
+
+message UpdateEventReply {}
+
+message DeleteEventRequest {
+    int64 id = 1;
+}
+
+message DeleteEventReply {}

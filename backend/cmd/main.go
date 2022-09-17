@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	"sample_shecodes2022/internal/database"
-	"sample_shecodes2022/internal/server"
+	"remy/internal/database"
+	"remy/internal/server"
 )
 
 func main() {

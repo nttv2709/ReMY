@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sample_shecodes2022/pkg/ent/player"
+	"remy/pkg/ent/event"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -31,7 +31,7 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		player.Table: player.ValidColumn,
+		event.Table: event.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -8,19 +8,22 @@ import (
 )
 
 var (
-	// PlayersColumns holds the columns for the "players" table.
-	PlayersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+	// EventsColumns holds the columns for the "events" table.
+	EventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "start", Type: field.TypeTime},
+		{Name: "end", Type: field.TypeTime},
 	}
-	// PlayersTable holds the schema information for the "players" table.
-	PlayersTable = &schema.Table{
-		Name:       "players",
-		Columns:    PlayersColumns,
-		PrimaryKey: []*schema.Column{PlayersColumns[0]},
+	// EventsTable holds the schema information for the "events" table.
+	EventsTable = &schema.Table{
+		Name:       "events",
+		Columns:    EventsColumns,
+		PrimaryKey: []*schema.Column{EventsColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		PlayersTable,
+		EventsTable,
 	}
 )
 

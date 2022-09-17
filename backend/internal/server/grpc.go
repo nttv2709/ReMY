@@ -7,8 +7,8 @@ import (
 	"log"
 	"net"
 
-	api "sample_shecodes2022/api/pb"
-	"sample_shecodes2022/internal/constants"
+	api "remy/api/pb"
+	"remy/internal/constants"
 
 	_ "github.com/go-sql-driver/mysql"
 

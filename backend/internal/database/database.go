@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sample_shecodes2022/pkg/ent"
+	"remy/pkg/ent"
 )
 
 var client *ent.Client
