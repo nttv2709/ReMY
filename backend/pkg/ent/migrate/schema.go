@@ -14,6 +14,8 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "start", Type: field.TypeTime},
 		{Name: "end", Type: field.TypeTime},
+		{Name: "x_pos", Type: field.TypeFloat32},
+		{Name: "y_pos", Type: field.TypeFloat32},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{

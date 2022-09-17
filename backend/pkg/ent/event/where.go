@@ -101,6 +101,20 @@ func End(v time.Time) predicate.Event {
 	})
 }
 
+// XPos applies equality check predicate on the "xPos" field. It's identical to XPosEQ.
+func XPos(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldXPos), v))
+	})
+}
+
+// YPos applies equality check predicate on the "yPos" field. It's identical to YPosEQ.
+func YPos(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldYPos), v))
+	})
+}
+
 // TitleEQ applies the EQ predicate on the "title" field.
 func TitleEQ(v string) predicate.Event {
 	return predicate.Event(func(s *sql.Selector) {
@@ -325,6 +339,134 @@ func EndLT(v time.Time) predicate.Event {
 func EndLTE(v time.Time) predicate.Event {
 	return predicate.Event(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldEnd), v))
+	})
+}
+
+// XPosEQ applies the EQ predicate on the "xPos" field.
+func XPosEQ(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldXPos), v))
+	})
+}
+
+// XPosNEQ applies the NEQ predicate on the "xPos" field.
+func XPosNEQ(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldXPos), v))
+	})
+}
+
+// XPosIn applies the In predicate on the "xPos" field.
+func XPosIn(vs ...float32) predicate.Event {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldXPos), v...))
+	})
+}
+
+// XPosNotIn applies the NotIn predicate on the "xPos" field.
+func XPosNotIn(vs ...float32) predicate.Event {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldXPos), v...))
+	})
+}
+
+// XPosGT applies the GT predicate on the "xPos" field.
+func XPosGT(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldXPos), v))
+	})
+}
+
+// XPosGTE applies the GTE predicate on the "xPos" field.
+func XPosGTE(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldXPos), v))
+	})
+}
+
+// XPosLT applies the LT predicate on the "xPos" field.
+func XPosLT(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldXPos), v))
+	})
+}
+
+// XPosLTE applies the LTE predicate on the "xPos" field.
+func XPosLTE(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldXPos), v))
+	})
+}
+
+// YPosEQ applies the EQ predicate on the "yPos" field.
+func YPosEQ(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldYPos), v))
+	})
+}
+
+// YPosNEQ applies the NEQ predicate on the "yPos" field.
+func YPosNEQ(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldYPos), v))
+	})
+}
+
+// YPosIn applies the In predicate on the "yPos" field.
+func YPosIn(vs ...float32) predicate.Event {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldYPos), v...))
+	})
+}
+
+// YPosNotIn applies the NotIn predicate on the "yPos" field.
+func YPosNotIn(vs ...float32) predicate.Event {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldYPos), v...))
+	})
+}
+
+// YPosGT applies the GT predicate on the "yPos" field.
+func YPosGT(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldYPos), v))
+	})
+}
+
+// YPosGTE applies the GTE predicate on the "yPos" field.
+func YPosGTE(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldYPos), v))
+	})
+}
+
+// YPosLT applies the LT predicate on the "yPos" field.
+func YPosLT(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldYPos), v))
+	})
+}
+
+// YPosLTE applies the LTE predicate on the "yPos" field.
+func YPosLTE(v float32) predicate.Event {
+	return predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldYPos), v))
 	})
 }
 

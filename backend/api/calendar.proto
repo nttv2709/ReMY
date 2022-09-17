@@ -22,6 +22,7 @@ message Event {
     int64 id = 1;
     string title = 2;
     RangeTime range_time = 3;
+    Location location = 4;
 }
 
 message ListEvents {
@@ -29,10 +30,15 @@ message ListEvents {
     google.protobuf.Timestamp time = 2;
 }
 
+message Location {
+    float x = 1;
+    float y = 2;
+}
+
 message CreateEventRequest {
     string title = 1;
     RangeTime range_time = 2;
-    // google.protobuf.SourceCodeInfo.Location location = 3;
+    Location location = 3;
 }
 
 message CreateEventReply {
@@ -63,9 +69,7 @@ message GetRemindReply {
 }
 
 message UpdateEventRequest {
-    int64 id = 1;
-    string title = 2;
-    RangeTime range_time = 3;
+    Event event = 1;
 }
 
 message UpdateEventReply {}

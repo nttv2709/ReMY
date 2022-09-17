@@ -47,6 +47,32 @@ func (eu *EventUpdate) SetEnd(t time.Time) *EventUpdate {
 	return eu
 }
 
+// SetXPos sets the "xPos" field.
+func (eu *EventUpdate) SetXPos(f float32) *EventUpdate {
+	eu.mutation.ResetXPos()
+	eu.mutation.SetXPos(f)
+	return eu
+}
+
+// AddXPos adds f to the "xPos" field.
+func (eu *EventUpdate) AddXPos(f float32) *EventUpdate {
+	eu.mutation.AddXPos(f)
+	return eu
+}
+
+// SetYPos sets the "yPos" field.
+func (eu *EventUpdate) SetYPos(f float32) *EventUpdate {
+	eu.mutation.ResetYPos()
+	eu.mutation.SetYPos(f)
+	return eu
+}
+
+// AddYPos adds f to the "yPos" field.
+func (eu *EventUpdate) AddYPos(f float32) *EventUpdate {
+	eu.mutation.AddYPos(f)
+	return eu
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (eu *EventUpdate) Mutation() *EventMutation {
 	return eu.mutation
@@ -151,6 +177,34 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: event.FieldEnd,
 		})
 	}
+	if value, ok := eu.mutation.XPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := eu.mutation.AddedXPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := eu.mutation.YPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	if value, ok := eu.mutation.AddedYPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
 	_spec.Modifiers = eu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -187,6 +241,32 @@ func (euo *EventUpdateOne) SetStart(t time.Time) *EventUpdateOne {
 // SetEnd sets the "end" field.
 func (euo *EventUpdateOne) SetEnd(t time.Time) *EventUpdateOne {
 	euo.mutation.SetEnd(t)
+	return euo
+}
+
+// SetXPos sets the "xPos" field.
+func (euo *EventUpdateOne) SetXPos(f float32) *EventUpdateOne {
+	euo.mutation.ResetXPos()
+	euo.mutation.SetXPos(f)
+	return euo
+}
+
+// AddXPos adds f to the "xPos" field.
+func (euo *EventUpdateOne) AddXPos(f float32) *EventUpdateOne {
+	euo.mutation.AddXPos(f)
+	return euo
+}
+
+// SetYPos sets the "yPos" field.
+func (euo *EventUpdateOne) SetYPos(f float32) *EventUpdateOne {
+	euo.mutation.ResetYPos()
+	euo.mutation.SetYPos(f)
+	return euo
+}
+
+// AddYPos adds f to the "yPos" field.
+func (euo *EventUpdateOne) AddYPos(f float32) *EventUpdateOne {
+	euo.mutation.AddYPos(f)
 	return euo
 }
 
@@ -322,6 +402,34 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: event.FieldEnd,
+		})
+	}
+	if value, ok := euo.mutation.XPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := euo.mutation.AddedXPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := euo.mutation.YPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	if value, ok := euo.mutation.AddedYPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
 		})
 	}
 	_spec.Modifiers = euo.modifiers
