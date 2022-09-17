@@ -118,7 +118,9 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 	}
 	var res []*api.ListEvents
 	for _, item := range type_date {
-		events := query.Where(event.StartEQ(*item.Date)).AllX(ctx)
+		events := s.ent.Debug().Event.Query().Where(func(s *sql.Selector) {
+        s.Where(sql.ExprP(fmt.Sprintf("DATE(%s) = ?", event.FieldStart), item.Date))
+    }).AllX(ctx)
 		res = append(res, &api.ListEvents{
 			Event: transformer.EventsToMessage(events),
 			Time:  timestamppb.New(*item.Date),

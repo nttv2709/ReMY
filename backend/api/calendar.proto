@@ -65,7 +65,7 @@ message GetRemindRequest {
 }
 
 message GetRemindReply {
-    google.protobuf.Timestamp time = 1;
+    int64 duration = 1;
     bool okay = 2;
 }
 

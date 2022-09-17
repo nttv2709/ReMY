@@ -36,6 +36,7 @@ func TestServer_ListEvents(t *testing.T) {
 		type_date []*records
 	)
 	query := client.Debug().Event.Query()
+	log.Println(query.AllX(ctx))
 	var date_type = "DATE"
 
 	err = query.Modify(func(s *sql.Selector) {
@@ -43,18 +44,20 @@ func TestServer_ListEvents(t *testing.T) {
 	}).Scan(ctx, &type_date)
 	var res []*api.ListEvents
 	for _, item := range type_date {
-		events := query.Where(event.StartEQ(*item.Date)).AllX(ctx)
+		events := client.Debug().Event.Query().Where(func(s *sql.Selector) {
+        s.Where(sql.ExprP(fmt.Sprintf("DATE(%s) = ?", event.FieldStart), item.Date))
+    }).AllX(ctx)
 		res = append(res, &api.ListEvents{
 			Event: transformer.EventsToMessage(events),
 			Time:  timestamppb.New(*item.Date),
 		})
 	}
+	log.Println(res)
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println(type_date)
 		for _, item := range type_date {
-			log.Println(item)
+			log.Println(item.Date)
 		}
 	}
 }
