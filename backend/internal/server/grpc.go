@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"time"
 
 	api "remy/api/pb"
@@ -17,6 +18,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -68,7 +70,6 @@ func (s *Server) Close() {
 }
 
 func (s *Server) CreateEvent(ctx context.Context, request *api.CreateEventRequest) (*api.CreateEventReply, error) {
-	// return nil, nil
 	log.Println("Request: ", request)
 	event, err := s.ent.Event.Create().SetXPos(request.Location.X).SetYPos(request.Location.Y).SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
 	if err != nil {
@@ -98,7 +99,7 @@ func (s *Server) UpdateEvent(ctx context.Context, request *api.UpdateEventReques
 func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest) (*api.ListEventsReply, error) {
 	query := s.ent.Debug().Event.Query().Where()
 	var date_type string
-	switch *&request.DateType {
+	switch request.DateType {
 	case api.ListEventsRequest_DAY:
 		date_type = "DATE"
 	case api.ListEventsRequest_MONTH:
@@ -118,7 +119,9 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 	}
 	var res []*api.ListEvents
 	for _, item := range type_date {
-		events := query.Where(event.StartEQ(*item.Date)).AllX(ctx)
+		events := s.ent.Debug().Event.Query().Where(func(s *sql.Selector) {
+			s.Where(sql.ExprP(fmt.Sprintf("DATE(%s) = ?", event.FieldStart), item.Date))
+		}).AllX(ctx)
 		res = append(res, &api.ListEvents{
 			Event: transformer.EventsToMessage(events),
 			Time:  timestamppb.New(*item.Date),
@@ -135,10 +138,33 @@ func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
+	var nextEvent *ent.Event
 	for _, q := range query {
-		log.Println(q)
+		log.Println(q.Start)
+		if q.Start.Sub(now) > 0 {
+			nextEvent = q
+		}
 	}
-	return nil, nil
+	okay := true
+	if nextEvent != nil {
+		timeLeft := nextEvent.Start.Sub(now)
+		travelTime := constants.GetTime(
+			constants.NewPoint(request.Location.X, request.Location.Y),
+			constants.NewPoint(nextEvent.XPos, nextEvent.YPos))
+		if travelTime < timeLeft {
+			okay = false
+		}
+		return &api.GetRemindReply{
+			Duration: int64(timeLeft.Minutes() - travelTime.Minutes()),
+			Okay:     okay,
+		}, nil
+	} else {
+		return &api.GetRemindReply{
+			Duration: -1,
+			Okay:     okay,
+		}, nil
+	}
 }
 
 func RunGRPC() {
@@ -166,22 +192,22 @@ func RunGRPC() {
 	}()
 
 	// GRPC cannot connect directly to web. Connect through grpcWeb
-	// grpcWebServer := grpcweb.WrapServer(
-	// 	s,
-	// 	// Enable CORS
-	// 	grpcweb.WithOriginFunc(func(origin string) bool { return true }),
-	// )
-	// handler := func(res http.ResponseWriter, req *http.Request) {
-	// 	grpcWebServer.ServeHTTP(res, req)
-	// }
+	grpcWebServer := grpcweb.WrapServer(
+		s,
+		// Enable CORS
+		grpcweb.WithOriginFunc(func(origin string) bool { return true }),
+	)
+	handler := func(res http.ResponseWriter, req *http.Request) {
+		grpcWebServer.ServeHTTP(res, req)
+	}
 
-	// srv := &http.Server{
-	// 	Handler: http.HandlerFunc(handler),
-	// 	Addr:    fmt.Sprintf("0.0.0.0:%d", *constants.Port+1),
-	// }
+	srv := &http.Server{
+		Handler: http.HandlerFunc(handler),
+		Addr:    fmt.Sprintf("0.0.0.0:%d", *constants.Port+1),
+	}
 
-	// log.Printf("http server listening at %v", srv.Addr)
-	// if err := srv.ListenAndServe(); err != nil {
-	// 	log.Fatalf("failed to serve: %v", err)
-	// }
+	log.Printf("http server listening at %v", srv.Addr)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
