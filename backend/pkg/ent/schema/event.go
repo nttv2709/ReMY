@@ -17,6 +17,8 @@ func (Event) Fields() []ent.Field {
 		field.String("title"),
 		field.Time("start"),
 		field.Time("end"),
+		field.Float32("xPos"),
+		field.Float32("yPos"),
 }
 }
 

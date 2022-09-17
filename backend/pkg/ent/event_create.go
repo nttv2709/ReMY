@@ -40,6 +40,18 @@ func (ec *EventCreate) SetEnd(t time.Time) *EventCreate {
 	return ec
 }
 
+// SetXPos sets the "xPos" field.
+func (ec *EventCreate) SetXPos(f float32) *EventCreate {
+	ec.mutation.SetXPos(f)
+	return ec
+}
+
+// SetYPos sets the "yPos" field.
+func (ec *EventCreate) SetYPos(f float32) *EventCreate {
+	ec.mutation.SetYPos(f)
+	return ec
+}
+
 // SetID sets the "id" field.
 func (ec *EventCreate) SetID(i int64) *EventCreate {
 	ec.mutation.SetID(i)
@@ -131,6 +143,12 @@ func (ec *EventCreate) check() error {
 	if _, ok := ec.mutation.End(); !ok {
 		return &ValidationError{Name: "end", err: errors.New(`ent: missing required field "Event.end"`)}
 	}
+	if _, ok := ec.mutation.XPos(); !ok {
+		return &ValidationError{Name: "xPos", err: errors.New(`ent: missing required field "Event.xPos"`)}
+	}
+	if _, ok := ec.mutation.YPos(); !ok {
+		return &ValidationError{Name: "yPos", err: errors.New(`ent: missing required field "Event.yPos"`)}
+	}
 	return nil
 }
 
@@ -188,6 +206,22 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 			Column: event.FieldEnd,
 		})
 		_node.End = value
+	}
+	if value, ok := ec.mutation.XPos(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+		_node.XPos = value
+	}
+	if value, ok := ec.mutation.YPos(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+		_node.YPos = value
 	}
 	return _node, _spec
 }
@@ -276,6 +310,42 @@ func (u *EventUpsert) SetEnd(v time.Time) *EventUpsert {
 // UpdateEnd sets the "end" field to the value that was provided on create.
 func (u *EventUpsert) UpdateEnd() *EventUpsert {
 	u.SetExcluded(event.FieldEnd)
+	return u
+}
+
+// SetXPos sets the "xPos" field.
+func (u *EventUpsert) SetXPos(v float32) *EventUpsert {
+	u.Set(event.FieldXPos, v)
+	return u
+}
+
+// UpdateXPos sets the "xPos" field to the value that was provided on create.
+func (u *EventUpsert) UpdateXPos() *EventUpsert {
+	u.SetExcluded(event.FieldXPos)
+	return u
+}
+
+// AddXPos adds v to the "xPos" field.
+func (u *EventUpsert) AddXPos(v float32) *EventUpsert {
+	u.Add(event.FieldXPos, v)
+	return u
+}
+
+// SetYPos sets the "yPos" field.
+func (u *EventUpsert) SetYPos(v float32) *EventUpsert {
+	u.Set(event.FieldYPos, v)
+	return u
+}
+
+// UpdateYPos sets the "yPos" field to the value that was provided on create.
+func (u *EventUpsert) UpdateYPos() *EventUpsert {
+	u.SetExcluded(event.FieldYPos)
+	return u
+}
+
+// AddYPos adds v to the "yPos" field.
+func (u *EventUpsert) AddYPos(v float32) *EventUpsert {
+	u.Add(event.FieldYPos, v)
 	return u
 }
 
@@ -368,6 +438,48 @@ func (u *EventUpsertOne) SetEnd(v time.Time) *EventUpsertOne {
 func (u *EventUpsertOne) UpdateEnd() *EventUpsertOne {
 	return u.Update(func(s *EventUpsert) {
 		s.UpdateEnd()
+	})
+}
+
+// SetXPos sets the "xPos" field.
+func (u *EventUpsertOne) SetXPos(v float32) *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.SetXPos(v)
+	})
+}
+
+// AddXPos adds v to the "xPos" field.
+func (u *EventUpsertOne) AddXPos(v float32) *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.AddXPos(v)
+	})
+}
+
+// UpdateXPos sets the "xPos" field to the value that was provided on create.
+func (u *EventUpsertOne) UpdateXPos() *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.UpdateXPos()
+	})
+}
+
+// SetYPos sets the "yPos" field.
+func (u *EventUpsertOne) SetYPos(v float32) *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.SetYPos(v)
+	})
+}
+
+// AddYPos adds v to the "yPos" field.
+func (u *EventUpsertOne) AddYPos(v float32) *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.AddYPos(v)
+	})
+}
+
+// UpdateYPos sets the "yPos" field to the value that was provided on create.
+func (u *EventUpsertOne) UpdateYPos() *EventUpsertOne {
+	return u.Update(func(s *EventUpsert) {
+		s.UpdateYPos()
 	})
 }
 
@@ -624,6 +736,48 @@ func (u *EventUpsertBulk) SetEnd(v time.Time) *EventUpsertBulk {
 func (u *EventUpsertBulk) UpdateEnd() *EventUpsertBulk {
 	return u.Update(func(s *EventUpsert) {
 		s.UpdateEnd()
+	})
+}
+
+// SetXPos sets the "xPos" field.
+func (u *EventUpsertBulk) SetXPos(v float32) *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.SetXPos(v)
+	})
+}
+
+// AddXPos adds v to the "xPos" field.
+func (u *EventUpsertBulk) AddXPos(v float32) *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.AddXPos(v)
+	})
+}
+
+// UpdateXPos sets the "xPos" field to the value that was provided on create.
+func (u *EventUpsertBulk) UpdateXPos() *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.UpdateXPos()
+	})
+}
+
+// SetYPos sets the "yPos" field.
+func (u *EventUpsertBulk) SetYPos(v float32) *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.SetYPos(v)
+	})
+}
+
+// AddYPos adds v to the "yPos" field.
+func (u *EventUpsertBulk) AddYPos(v float32) *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.AddYPos(v)
+	})
+}
+
+// UpdateYPos sets the "yPos" field to the value that was provided on create.
+func (u *EventUpsertBulk) UpdateYPos() *EventUpsertBulk {
+	return u.Update(func(s *EventUpsert) {
+		s.UpdateYPos()
 	})
 }
 

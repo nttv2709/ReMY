@@ -22,6 +22,10 @@ type Event struct {
 	Start time.Time `json:"start,omitempty"`
 	// End holds the value of the "end" field.
 	End time.Time `json:"end,omitempty"`
+	// XPos holds the value of the "xPos" field.
+	XPos float32 `json:"xPos,omitempty"`
+	// YPos holds the value of the "yPos" field.
+	YPos float32 `json:"yPos,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -29,6 +33,8 @@ func (*Event) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case event.FieldXPos, event.FieldYPos:
+			values[i] = new(sql.NullFloat64)
 		case event.FieldID:
 			values[i] = new(sql.NullInt64)
 		case event.FieldTitle:
@@ -74,6 +80,18 @@ func (e *Event) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				e.End = value.Time
 			}
+		case event.FieldXPos:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field xPos", values[i])
+			} else if value.Valid {
+				e.XPos = float32(value.Float64)
+			}
+		case event.FieldYPos:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field yPos", values[i])
+			} else if value.Valid {
+				e.YPos = float32(value.Float64)
+			}
 		}
 	}
 	return nil
@@ -110,6 +128,12 @@ func (e *Event) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("end=")
 	builder.WriteString(e.End.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("xPos=")
+	builder.WriteString(fmt.Sprintf("%v", e.XPos))
+	builder.WriteString(", ")
+	builder.WriteString("yPos=")
+	builder.WriteString(fmt.Sprintf("%v", e.YPos))
 	builder.WriteByte(')')
 	return builder.String()
 }

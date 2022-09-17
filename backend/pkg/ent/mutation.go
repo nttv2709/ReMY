@@ -35,6 +35,10 @@ type EventMutation struct {
 	title         *string
 	start         *time.Time
 	end           *time.Time
+	xPos          *float32
+	addxPos       *float32
+	yPos          *float32
+	addyPos       *float32
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Event, error)
@@ -253,6 +257,118 @@ func (m *EventMutation) ResetEnd() {
 	m.end = nil
 }
 
+// SetXPos sets the "xPos" field.
+func (m *EventMutation) SetXPos(f float32) {
+	m.xPos = &f
+	m.addxPos = nil
+}
+
+// XPos returns the value of the "xPos" field in the mutation.
+func (m *EventMutation) XPos() (r float32, exists bool) {
+	v := m.xPos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldXPos returns the old "xPos" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldXPos(ctx context.Context) (v float32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldXPos is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldXPos requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldXPos: %w", err)
+	}
+	return oldValue.XPos, nil
+}
+
+// AddXPos adds f to the "xPos" field.
+func (m *EventMutation) AddXPos(f float32) {
+	if m.addxPos != nil {
+		*m.addxPos += f
+	} else {
+		m.addxPos = &f
+	}
+}
+
+// AddedXPos returns the value that was added to the "xPos" field in this mutation.
+func (m *EventMutation) AddedXPos() (r float32, exists bool) {
+	v := m.addxPos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetXPos resets all changes to the "xPos" field.
+func (m *EventMutation) ResetXPos() {
+	m.xPos = nil
+	m.addxPos = nil
+}
+
+// SetYPos sets the "yPos" field.
+func (m *EventMutation) SetYPos(f float32) {
+	m.yPos = &f
+	m.addyPos = nil
+}
+
+// YPos returns the value of the "yPos" field in the mutation.
+func (m *EventMutation) YPos() (r float32, exists bool) {
+	v := m.yPos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldYPos returns the old "yPos" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldYPos(ctx context.Context) (v float32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldYPos is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldYPos requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldYPos: %w", err)
+	}
+	return oldValue.YPos, nil
+}
+
+// AddYPos adds f to the "yPos" field.
+func (m *EventMutation) AddYPos(f float32) {
+	if m.addyPos != nil {
+		*m.addyPos += f
+	} else {
+		m.addyPos = &f
+	}
+}
+
+// AddedYPos returns the value that was added to the "yPos" field in this mutation.
+func (m *EventMutation) AddedYPos() (r float32, exists bool) {
+	v := m.addyPos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetYPos resets all changes to the "yPos" field.
+func (m *EventMutation) ResetYPos() {
+	m.yPos = nil
+	m.addyPos = nil
+}
+
 // Where appends a list predicates to the EventMutation builder.
 func (m *EventMutation) Where(ps ...predicate.Event) {
 	m.predicates = append(m.predicates, ps...)
@@ -272,7 +388,7 @@ func (m *EventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.title != nil {
 		fields = append(fields, event.FieldTitle)
 	}
@@ -281,6 +397,12 @@ func (m *EventMutation) Fields() []string {
 	}
 	if m.end != nil {
 		fields = append(fields, event.FieldEnd)
+	}
+	if m.xPos != nil {
+		fields = append(fields, event.FieldXPos)
+	}
+	if m.yPos != nil {
+		fields = append(fields, event.FieldYPos)
 	}
 	return fields
 }
@@ -296,6 +418,10 @@ func (m *EventMutation) Field(name string) (ent.Value, bool) {
 		return m.Start()
 	case event.FieldEnd:
 		return m.End()
+	case event.FieldXPos:
+		return m.XPos()
+	case event.FieldYPos:
+		return m.YPos()
 	}
 	return nil, false
 }
@@ -311,6 +437,10 @@ func (m *EventMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStart(ctx)
 	case event.FieldEnd:
 		return m.OldEnd(ctx)
+	case event.FieldXPos:
+		return m.OldXPos(ctx)
+	case event.FieldYPos:
+		return m.OldYPos(ctx)
 	}
 	return nil, fmt.Errorf("unknown Event field %s", name)
 }
@@ -341,6 +471,20 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetEnd(v)
 		return nil
+	case event.FieldXPos:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetXPos(v)
+		return nil
+	case event.FieldYPos:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetYPos(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)
 }
@@ -348,13 +492,26 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *EventMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addxPos != nil {
+		fields = append(fields, event.FieldXPos)
+	}
+	if m.addyPos != nil {
+		fields = append(fields, event.FieldYPos)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *EventMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case event.FieldXPos:
+		return m.AddedXPos()
+	case event.FieldYPos:
+		return m.AddedYPos()
+	}
 	return nil, false
 }
 
@@ -363,6 +520,20 @@ func (m *EventMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *EventMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case event.FieldXPos:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddXPos(v)
+		return nil
+	case event.FieldYPos:
+		v, ok := value.(float32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddYPos(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Event numeric field %s", name)
 }
@@ -398,6 +569,12 @@ func (m *EventMutation) ResetField(name string) error {
 		return nil
 	case event.FieldEnd:
 		m.ResetEnd()
+		return nil
+	case event.FieldXPos:
+		m.ResetXPos()
+		return nil
+	case event.FieldYPos:
+		m.ResetYPos()
 		return nil
 	}
 	return fmt.Errorf("unknown Event field %s", name)
