@@ -1,1 +1,1 @@
-# sample_shecodes2022
+# reminder for events

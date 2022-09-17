@@ -15,7 +15,7 @@ func Init() (*ent.Client, error) {
 	DB_IN_PORT := "3306"
 	DB_USER := "root"
 	DB_PASS := "P@ssw0rd"
-	DB_NAME := "sample"
+	DB_NAME := "remy"
 	fmt.Printf("db_out: %s, db_in: %s\n", DB_OUT_PORT, DB_IN_PORT)
 	fmt.Printf("Connecting to Mysql: %s:%s@tcp(%s:%s)/%s?parseTime=True\n", DB_USER, DB_PASS, DB_HOST, DB_OUT_PORT, DB_NAME)
 	database, errDB := ent.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=True", DB_USER, DB_PASS, DB_HOST, DB_OUT_PORT, DB_NAME))
