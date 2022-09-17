@@ -1,20 +1,48 @@
-import React from 'react'
+import * as React from 'react'
 import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS, createEventId } from './event-utils'
+import {CalendarServiceClient} from '../api/CalendarServiceClientPb'
+import {CreateEventRequest, Location, RangeTime} from '../api/calendar_pb'
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+
+
+// import Box from '@mui/material/Box';
+// import Button from '@mui/material/Button';
+// import Typography from '@mui/material/Typography';
+// import Modal from '@mui/material/Modal';
 
 interface CalGridState {
   weekendsVisible: boolean
   currentEvents: EventApi[]
 }
 
+// const [open, setOpen] = React.useState(false);
+// const handleOpen = () => setOpen(true);
+// const handleClose = () => setOpen(false);
+const client = new CalendarServiceClient("http://localhost:50052", null, null)
+
 export default class CalGrid extends React.Component<{}, CalGridState> {
 
   state: CalGridState = {
     weekendsVisible: true,
     currentEvents: []
+  }
+  
+  async create(){
+    const req = new CreateEventRequest()
+    req.setTitle("1")
+    req.setLocation(new Location().setX(1).setY(1))
+    req.setRangeTime(new RangeTime().setStart(new Timestamp().setSeconds(20)).setEnd(new Timestamp().setSeconds(20)))
+    const res = await client.createEvent(req, {}, (err, response) => {
+      if (err) {
+        console.log("Error:", err);
+      } else {
+        console.log("Response: ", response)
+      }
+    })
   }
 
   render() {
@@ -90,6 +118,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
 
   handleDateSelect = (selectInfo: DateSelectArg) => {
     let title = prompt('Please enter a new title for your event')
+    // let location = prompt('Please enter a location for your event')
     let calendarApi = selectInfo.view.calendar
 
     calendarApi.unselect() // clear date selection
@@ -98,6 +127,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
       calendarApi.addEvent({
         id: createEventId(),
         title,
+        // location,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
