@@ -18,8 +18,9 @@ import (
 // EventUpdate is the builder for updating Event entities.
 type EventUpdate struct {
 	config
-	hooks    []Hook
-	mutation *EventMutation
+	hooks     []Hook
+	mutation  *EventMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the EventUpdate builder.
@@ -105,6 +106,12 @@ func (eu *EventUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (eu *EventUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdate {
+	eu.modifiers = append(eu.modifiers, modifiers...)
+	return eu
+}
+
 func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -144,6 +151,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: event.FieldEnd,
 		})
 	}
+	_spec.Modifiers = eu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
@@ -158,9 +166,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // EventUpdateOne is the builder for updating a single Event entity.
 type EventUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *EventMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *EventMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetTitle sets the "title" field.
@@ -253,6 +262,12 @@ func (euo *EventUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (euo *EventUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdateOne {
+	euo.modifiers = append(euo.modifiers, modifiers...)
+	return euo
+}
+
 func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -309,6 +324,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			Column: event.FieldEnd,
 		})
 	}
+	_spec.Modifiers = euo.modifiers
 	_node = &Event{config: euo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
