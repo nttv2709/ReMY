@@ -2,13 +2,14 @@ syntax = "proto3";
 
 package api;
 
-option go_package = "github.com/nttv2709/sample_shecodes2022";
+option go_package = "github.com/nttv2709/remy";
 import "google/protobuf/timestamp.proto";
 
 service CalendarService {
     rpc CreateEvent(CreateEventRequest) returns (CreateEventReply) {}
     rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventReply) {}
     rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventReply) {} 
+    rpc ListEvents(ListEventsRequest) returns (ListEventsReply) {}
     rpc GetRemind(GetRemindRequest) returns (GetRemindReply) {}
 }
 
@@ -21,6 +22,7 @@ message Event {
     int64 id = 1;
     string title = 2;
     RangeTime range_time = 3;
+    Location location = 4;
 }
 
 message ListEvents {
@@ -28,28 +30,47 @@ message ListEvents {
     google.protobuf.Timestamp time = 2;
 }
 
+message Location {
+    float x = 1;
+    float y = 2;
+}
+
 message CreateEventRequest {
     string title = 1;
     RangeTime range_time = 2;
-    // google.protobuf.SourceCodeInfo.Location location = 3;
+    Location location = 3;
 }
 
 message CreateEventReply {
     int64 id = 1;
 }
 
-message GetRemindRequest {
+message ListEventsRequest {
     RangeTime range_time = 1;
+    DATE_TYPE date_type = 2;
+
+    enum DATE_TYPE {
+        DAY = 0;
+        MONTH = 1;
+        YEAR = 2;
+    }
 }
 
-message GetRemindReply {
+message ListEventsReply {
     repeated ListEvents list_events = 1;
 }
 
+message GetRemindRequest {
+    Location location = 1;
+}
+
+message GetRemindReply {
+    google.protobuf.Timestamp time = 1;
+    bool okay = 2;
+}
+
 message UpdateEventRequest {
-    int64 id = 1;
-    string title = 2;
-    RangeTime range_time = 3;
+    Event event = 1;
 }
 
 message UpdateEventReply {}

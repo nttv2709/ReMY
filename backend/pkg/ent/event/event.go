@@ -13,6 +13,10 @@ const (
 	FieldStart = "start"
 	// FieldEnd holds the string denoting the end field in the database.
 	FieldEnd = "end"
+	// FieldXPos holds the string denoting the xpos field in the database.
+	FieldXPos = "x_pos"
+	// FieldYPos holds the string denoting the ypos field in the database.
+	FieldYPos = "y_pos"
 	// Table holds the table name of the event in the database.
 	Table = "events"
 )
@@ -23,6 +27,8 @@ var Columns = []string{
 	FieldTitle,
 	FieldStart,
 	FieldEnd,
+	FieldXPos,
+	FieldYPos,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

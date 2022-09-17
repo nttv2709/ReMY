@@ -4,7 +4,7 @@
 // - protoc             v3.19.4
 // source: calendar.proto
 
-package sample_shecodes2022
+package remy
 
 import (
 	context "context"
@@ -25,6 +25,7 @@ type CalendarServiceClient interface {
 	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*CreateEventReply, error)
 	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*UpdateEventReply, error)
 	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventReply, error)
+	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error)
 	GetRemind(ctx context.Context, in *GetRemindRequest, opts ...grpc.CallOption) (*GetRemindReply, error)
 }
 
@@ -63,6 +64,15 @@ func (c *calendarServiceClient) DeleteEvent(ctx context.Context, in *DeleteEvent
 	return out, nil
 }
 
+func (c *calendarServiceClient) ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsReply, error) {
+	out := new(ListEventsReply)
+	err := c.cc.Invoke(ctx, "/api.CalendarService/ListEvents", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *calendarServiceClient) GetRemind(ctx context.Context, in *GetRemindRequest, opts ...grpc.CallOption) (*GetRemindReply, error) {
 	out := new(GetRemindReply)
 	err := c.cc.Invoke(ctx, "/api.CalendarService/GetRemind", in, out, opts...)
@@ -79,6 +89,7 @@ type CalendarServiceServer interface {
 	CreateEvent(context.Context, *CreateEventRequest) (*CreateEventReply, error)
 	UpdateEvent(context.Context, *UpdateEventRequest) (*UpdateEventReply, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventReply, error)
+	ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error)
 	GetRemind(context.Context, *GetRemindRequest) (*GetRemindReply, error)
 	mustEmbedUnimplementedCalendarServiceServer()
 }
@@ -95,6 +106,9 @@ func (UnimplementedCalendarServiceServer) UpdateEvent(context.Context, *UpdateEv
 }
 func (UnimplementedCalendarServiceServer) DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEvent not implemented")
+}
+func (UnimplementedCalendarServiceServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
 }
 func (UnimplementedCalendarServiceServer) GetRemind(context.Context, *GetRemindRequest) (*GetRemindReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRemind not implemented")
@@ -166,6 +180,24 @@ func _CalendarService_DeleteEvent_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CalendarService_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CalendarServiceServer).ListEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.CalendarService/ListEvents",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CalendarServiceServer).ListEvents(ctx, req.(*ListEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CalendarService_GetRemind_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRemindRequest)
 	if err := dec(in); err != nil {
@@ -202,6 +234,10 @@ var CalendarService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteEvent",
 			Handler:    _CalendarService_DeleteEvent_Handler,
+		},
+		{
+			MethodName: "ListEvents",
+			Handler:    _CalendarService_ListEvents_Handler,
 		},
 		{
 			MethodName: "GetRemind",

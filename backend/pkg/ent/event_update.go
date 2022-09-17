@@ -18,8 +18,9 @@ import (
 // EventUpdate is the builder for updating Event entities.
 type EventUpdate struct {
 	config
-	hooks    []Hook
-	mutation *EventMutation
+	hooks     []Hook
+	mutation  *EventMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the EventUpdate builder.
@@ -43,6 +44,32 @@ func (eu *EventUpdate) SetStart(t time.Time) *EventUpdate {
 // SetEnd sets the "end" field.
 func (eu *EventUpdate) SetEnd(t time.Time) *EventUpdate {
 	eu.mutation.SetEnd(t)
+	return eu
+}
+
+// SetXPos sets the "xPos" field.
+func (eu *EventUpdate) SetXPos(f float32) *EventUpdate {
+	eu.mutation.ResetXPos()
+	eu.mutation.SetXPos(f)
+	return eu
+}
+
+// AddXPos adds f to the "xPos" field.
+func (eu *EventUpdate) AddXPos(f float32) *EventUpdate {
+	eu.mutation.AddXPos(f)
+	return eu
+}
+
+// SetYPos sets the "yPos" field.
+func (eu *EventUpdate) SetYPos(f float32) *EventUpdate {
+	eu.mutation.ResetYPos()
+	eu.mutation.SetYPos(f)
+	return eu
+}
+
+// AddYPos adds f to the "yPos" field.
+func (eu *EventUpdate) AddYPos(f float32) *EventUpdate {
+	eu.mutation.AddYPos(f)
 	return eu
 }
 
@@ -105,6 +132,12 @@ func (eu *EventUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (eu *EventUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdate {
+	eu.modifiers = append(eu.modifiers, modifiers...)
+	return eu
+}
+
 func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -144,6 +177,35 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: event.FieldEnd,
 		})
 	}
+	if value, ok := eu.mutation.XPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := eu.mutation.AddedXPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := eu.mutation.YPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	if value, ok := eu.mutation.AddedYPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	_spec.Modifiers = eu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
@@ -158,9 +220,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 // EventUpdateOne is the builder for updating a single Event entity.
 type EventUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *EventMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *EventMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetTitle sets the "title" field.
@@ -178,6 +241,32 @@ func (euo *EventUpdateOne) SetStart(t time.Time) *EventUpdateOne {
 // SetEnd sets the "end" field.
 func (euo *EventUpdateOne) SetEnd(t time.Time) *EventUpdateOne {
 	euo.mutation.SetEnd(t)
+	return euo
+}
+
+// SetXPos sets the "xPos" field.
+func (euo *EventUpdateOne) SetXPos(f float32) *EventUpdateOne {
+	euo.mutation.ResetXPos()
+	euo.mutation.SetXPos(f)
+	return euo
+}
+
+// AddXPos adds f to the "xPos" field.
+func (euo *EventUpdateOne) AddXPos(f float32) *EventUpdateOne {
+	euo.mutation.AddXPos(f)
+	return euo
+}
+
+// SetYPos sets the "yPos" field.
+func (euo *EventUpdateOne) SetYPos(f float32) *EventUpdateOne {
+	euo.mutation.ResetYPos()
+	euo.mutation.SetYPos(f)
+	return euo
+}
+
+// AddYPos adds f to the "yPos" field.
+func (euo *EventUpdateOne) AddYPos(f float32) *EventUpdateOne {
+	euo.mutation.AddYPos(f)
 	return euo
 }
 
@@ -253,6 +342,12 @@ func (euo *EventUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (euo *EventUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdateOne {
+	euo.modifiers = append(euo.modifiers, modifiers...)
+	return euo
+}
+
 func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -309,6 +404,35 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			Column: event.FieldEnd,
 		})
 	}
+	if value, ok := euo.mutation.XPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := euo.mutation.AddedXPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldXPos,
+		})
+	}
+	if value, ok := euo.mutation.YPos(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	if value, ok := euo.mutation.AddedYPos(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat32,
+			Value:  value,
+			Column: event.FieldYPos,
+		})
+	}
+	_spec.Modifiers = euo.modifiers
 	_node = &Event{config: euo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

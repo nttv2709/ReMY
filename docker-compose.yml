@@ -2,22 +2,22 @@ services:
   #-----------------------------------------------------------------
   mysql-server:
     image: mysql:latest
-    container_name: mysql-sample
+    container_name: mysql-server
     ports:
       - 3306:3306
     volumes:
       - db:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      MYSQL_DATABASE: "sample"
+      MYSQL_DATABASE: "remy"
       MYSQL_ROOT_PASSWORD: "P@ssw0rd"
 
   #-----------------------------------------------------------------
-  sample:
+  remy:
     build:
       context: .
       dockerfile: backend/build/Dockerfile
-    container_name: sample
+    container_name: remy
     environment:
       DB_HOST: mysql-server
     ports:
