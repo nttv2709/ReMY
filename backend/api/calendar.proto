@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api;
 
-option go_package = "github.com/nttv2709/sample_shecodes2022";
+option go_package = "github.com/nttv2709/remy";
 import "google/protobuf/timestamp.proto";
 
 service CalendarService {

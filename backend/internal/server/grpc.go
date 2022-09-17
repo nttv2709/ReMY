@@ -9,6 +9,8 @@ import (
 
 	api "remy/api/pb"
 	"remy/internal/constants"
+	"remy/internal/database"
+	"remy/pkg/ent"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -19,7 +21,8 @@ import (
 
 type Server struct {
 	logger *zap.Logger
-	api.UnimplementedSampleServiceServer
+	api.UnimplementedCalendarServiceServer
+	ent *ent.Client
 }
 
 func NewLogger(lv zapcore.Level, pretty bool) (*zap.Logger, error) {
@@ -42,7 +45,7 @@ func NewLogger(lv zapcore.Level, pretty bool) (*zap.Logger, error) {
 	return c.Build(opts...)
 }
 
-func NewServer() (*Server, error) {
+func NewServer(ent *ent.Client) (*Server, error) {
 	// Initial logger
 	logger, errLog := NewLogger(zap.DebugLevel, true)
 	if errLog != nil {
@@ -58,10 +61,8 @@ func (s *Server) Close() {
 	s.logger.Core().Sync()
 }
 
-func (s *Server) SayHello(ctx context.Context, request *api.Request) (*api.Reply, error) {
-	return &api.Reply{
-		NMsg: "Hello " + request.Msg,
-	}, nil
+func (s *Server) CreateEvent(ctx context.Context, request *api.CreateEventRequest) (*api.CreateEventReply, error) {
+	return nil, nil
 }
 
 func RunGRPC() {
@@ -70,14 +71,19 @@ func RunGRPC() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	
+	db, err := database.Init()
+	if err != nil {
+		log.Println(err)
+	}
 
-	service, err := NewServer()
+	service, err := NewServer(db)
 	if err != nil {
 		log.Fatalf("fail to create service: %s", err)
 	}
 
 	s := grpc.NewServer()
-	api.RegisterSampleServiceServer(s, service)
+	api.RegisterCalendarServiceServer(s, service)
 	log.Printf("grpc server listening at %v", lis.Addr())
 	go func() {
 		log.Fatalf("failed to serve: %v", s.Serve(lis))
