@@ -68,7 +68,6 @@ func (s *Server) Close() {
 }
 
 func (s *Server) CreateEvent(ctx context.Context, request *api.CreateEventRequest) (*api.CreateEventReply, error) {
-	// return nil, nil
 	log.Println("Request: ", request)
 	event, err := s.ent.Event.Create().SetXPos(request.Location.X).SetYPos(request.Location.Y).SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
 	if err != nil {
@@ -98,7 +97,7 @@ func (s *Server) UpdateEvent(ctx context.Context, request *api.UpdateEventReques
 func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest) (*api.ListEventsReply, error) {
 	query := s.ent.Debug().Event.Query().Where()
 	var date_type string
-	switch *&request.DateType {
+	switch request.DateType {
 	case api.ListEventsRequest_DAY:
 		date_type = "DATE"
 	case api.ListEventsRequest_MONTH:
@@ -140,13 +139,14 @@ func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (
 	now := time.Now()
 	var nextEvent *ent.Event
 	for _, q := range query {
+		log.Println(q.Start)
 		if q.Start.Sub(now) > 0 {
 			nextEvent = q
 		}
 	}
-	timeLeft := nextEvent.Start.Sub(now)
 	okay := true
 	if nextEvent != nil {
+		timeLeft := nextEvent.Start.Sub(now)
 		travelTime := constants.GetTime(
 			constants.NewPoint(request.Location.X, request.Location.Y),
 			constants.NewPoint(nextEvent.XPos, nextEvent.YPos))
