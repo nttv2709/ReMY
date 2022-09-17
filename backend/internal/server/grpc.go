@@ -119,8 +119,8 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 	var res []*api.ListEvents
 	for _, item := range type_date {
 		events := s.ent.Debug().Event.Query().Where(func(s *sql.Selector) {
-        s.Where(sql.ExprP(fmt.Sprintf("DATE(%s) = ?", event.FieldStart), item.Date))
-    }).AllX(ctx)
+			s.Where(sql.ExprP(fmt.Sprintf("DATE(%s) = ?", event.FieldStart), item.Date))
+		}).AllX(ctx)
 		res = append(res, &api.ListEvents{
 			Event: transformer.EventsToMessage(events),
 			Time:  timestamppb.New(*item.Date),
@@ -153,15 +153,16 @@ func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (
 		if travelTime < timeLeft {
 			okay = false
 		}
-
+		return &api.GetRemindReply{
+			Duration: int64(timeLeft.Minutes() - travelTime.Minutes()),
+			Okay:     okay,
+		}, nil
 	} else {
 		return &api.GetRemindReply{
-			Time: timestamppb.New(time.Time{}),
-			Okay: okay,
+			Duration: -1,
+			Okay:     okay,
 		}, nil
 	}
-
-	return nil, nil
 }
 
 func RunGRPC() {
