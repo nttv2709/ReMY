@@ -61,11 +61,12 @@ message ListEventsReply {
 }
 
 message GetRemindRequest {
-    RangeTime range_time = 1;
+    Location location = 1;
 }
 
 message GetRemindReply {
-    repeated ListEvents list_events = 1;
+    google.protobuf.Timestamp time = 1;
+    bool okay = 2;
 }
 
 message UpdateEventRequest {
