@@ -132,6 +132,13 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 }
 
 func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (*api.GetRemindReply, error) {
+	query, err := s.ent.Debug().Event.Query().Order(ent.Asc(event.FieldStart)).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, q := range query {
+		log.Println(q)
+	}
 	return nil, nil
 }
 
