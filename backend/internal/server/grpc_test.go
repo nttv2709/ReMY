@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
+	api "remy/api/pb"
+	"remy/internal/transformer"
+	"remy/pkg/ent"
 	"remy/pkg/ent/enttest"
 	"remy/pkg/ent/event"
 	"testing"
@@ -11,6 +15,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -38,6 +44,14 @@ func TestServer_ListEvents(t *testing.T) {
 	err = query.Modify(func(s *sql.Selector) {
 		s.Select(fmt.Sprintf("DATE(%s)", event.FieldStart)).GroupBy(fmt.Sprintf("%s(%s)", date_type, event.FieldStart))
 	}).Scan(ctx, &type_date)
+	var res []*api.ListEvents
+	for _, item := range type_date {
+		events := query.Where(event.StartEQ(*item.Date)).AllX(ctx)
+		res = append(res, &api.ListEvents{
+			Event: transformer.EventsToMessage(events),
+			Time:  timestamppb.New(*item.Date),
+		})
+	}
 	if err != nil {
 		log.Println(err)
 	} else {
@@ -46,4 +60,8 @@ func TestServer_ListEvents(t *testing.T) {
 			log.Println(item)
 		}
 	}
+}
+
+func TestServer_CreateEvent(t *testing.T) {
+	
 }

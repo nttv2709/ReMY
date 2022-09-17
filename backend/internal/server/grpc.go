@@ -70,7 +70,7 @@ func (s *Server) Close() {
 func (s *Server) CreateEvent(ctx context.Context, request *api.CreateEventRequest) (*api.CreateEventReply, error) {
 	// return nil, nil
 	log.Println("Request: ", request)
-	event, err := s.ent.Event.Create().SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
+	event, err := s.ent.Event.Create().SetXPos(request.Location.X).SetYPos(request.Location.Y).SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *Server) DeleteEvent(ctx context.Context, request *api.DeleteEventReques
 }
 
 func (s *Server) UpdateEvent(ctx context.Context, request *api.UpdateEventRequest) (*api.UpdateEventReply, error) {
-	_, err := s.ent.Event.Update().SetStart(request.RangeTime.Start.AsTime()).SetEnd(request.RangeTime.End.AsTime()).SetTitle(request.Title).Save(ctx)
+	_, err := s.ent.Event.Update().SetXPos(request.Event.Location.X).SetYPos(request.Event.Location.Y).SetStart(request.Event.RangeTime.Start.AsTime()).SetEnd(request.Event.RangeTime.End.AsTime()).SetTitle(request.Event.Title).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -106,9 +106,10 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 	case api.ListEventsRequest_YEAR:
 		date_type = "YEAR"
 	}
-	var type_date []struct {
-		Start time.Time
+	type records struct {
+		Date *time.Time
 	}
+	var type_date []*records
 	err := query.Modify(func(s *sql.Selector) {
 		s.Select(fmt.Sprintf("DATE(%s)", event.FieldStart)).GroupBy(fmt.Sprintf("%s(%s)", date_type, event.FieldStart))
 	}).Scan(ctx, &type_date)
@@ -117,12 +118,10 @@ func (s *Server) ListEvents(ctx context.Context, request *api.ListEventsRequest)
 	}
 	var res []*api.ListEvents
 	for _, item := range type_date {
-		events := query.Where(func(s *sql.Selector) {
-			sql.EQ(fmt.Sprintf("%s(%s)", date_type, event.FieldStart), item)
-		}).AllX(ctx)
+		events := query.Where(event.StartEQ(*item.Date)).AllX(ctx)
 		res = append(res, &api.ListEvents{
 			Event: transformer.EventsToMessage(events),
-			Time:  timestamppb.New(item.Start),
+			Time:  timestamppb.New(*item.Date),
 		})
 	}
 
