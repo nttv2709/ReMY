@@ -22,6 +22,7 @@ services:
       DB_HOST: mysql-server
     ports:
       - 50051:50051
+      - 50052:50052
     restart: always
     depends_on:
       - mysql-server

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"time"
 
 	api "remy/api/pb"
@@ -17,6 +18,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -190,22 +192,22 @@ func RunGRPC() {
 	}()
 
 	// GRPC cannot connect directly to web. Connect through grpcWeb
-	// grpcWebServer := grpcweb.WrapServer(
-	// 	s,
-	// 	// Enable CORS
-	// 	grpcweb.WithOriginFunc(func(origin string) bool { return true }),
-	// )
-	// handler := func(res http.ResponseWriter, req *http.Request) {
-	// 	grpcWebServer.ServeHTTP(res, req)
-	// }
+	grpcWebServer := grpcweb.WrapServer(
+		s,
+		// Enable CORS
+		grpcweb.WithOriginFunc(func(origin string) bool { return true }),
+	)
+	handler := func(res http.ResponseWriter, req *http.Request) {
+		grpcWebServer.ServeHTTP(res, req)
+	}
 
-	// srv := &http.Server{
-	// 	Handler: http.HandlerFunc(handler),
-	// 	Addr:    fmt.Sprintf("0.0.0.0:%d", *constants.Port+1),
-	// }
+	srv := &http.Server{
+		Handler: http.HandlerFunc(handler),
+		Addr:    fmt.Sprintf("0.0.0.0:%d", *constants.Port+1),
+	}
 
-	// log.Printf("http server listening at %v", srv.Addr)
-	// if err := srv.ListenAndServe(); err != nil {
-	// 	log.Fatalf("failed to serve: %v", err)
-	// }
+	log.Printf("http server listening at %v", srv.Addr)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
