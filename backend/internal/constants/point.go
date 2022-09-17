@@ -1,11 +1,11 @@
 package constants
 
 type Point struct {
-	X float64
-	Y float64
+	X float32
+	Y float32
 }
 
-func NewPoint(x, y float64) *Point {
+func NewPoint(x, y float32) *Point {
 	return &Point{
 		X: x,
 		Y: y,

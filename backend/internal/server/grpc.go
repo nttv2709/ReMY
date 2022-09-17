@@ -135,9 +135,30 @@ func (s *Server) GetRemind(ctx context.Context, request *api.GetRemindRequest) (
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
+	var nextEvent *ent.Event
 	for _, q := range query {
-		log.Println(q)
+		if q.Start.Sub(now) > 0 {
+			nextEvent = q
+		}
 	}
+	timeLeft := nextEvent.Start.Sub(now)
+	okay := true
+	if nextEvent != nil {
+		travelTime := constants.GetTime(
+			constants.NewPoint(request.Location.X, request.Location.Y),
+			constants.NewPoint(nextEvent.XPos, nextEvent.YPos))
+		if travelTime < timeLeft {
+			okay = false
+		}
+
+	} else {
+		return &api.GetRemindReply{
+			Time: timestamppb.New(time.Time{}),
+			Okay: okay,
+		}, nil
+	}
+
 	return nil, nil
 }
 
