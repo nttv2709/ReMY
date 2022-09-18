@@ -4,8 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS, createEventId } from './event-utils'
-import {CalendarServiceClient} from '../api/CalendarServiceClientPb'
-import {CreateEventRequest, Location, RangeTime} from '../api/calendar_pb'
+import { CalendarServiceClient } from '../api/CalendarServiceClientPb'
+import { CreateEventRequest, Location, RangeTime } from '../api/calendar_pb'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 // import { FormControl, InputLabel, Input, FormHelperText } from '@mui/material';
 
@@ -21,7 +21,27 @@ interface CalGridState {
   currentEvents: EventApi[]
 }
 
-const client = new CalendarServiceClient("http://localhost:50052", null, null)
+let map: google.maps.Map;
+
+
+const configURL = "https://raw.githubusercontent.com/nttv2709/shecodes-config/main/host.json"
+const getRemoteHost = () => {
+ try {
+  const request = new XMLHttpRequest();
+  request.open('GET', configURL, false);  // `false` makes the request synchronous
+  request.send(null);
+
+  console.log(request.responseText);
+  return JSON.parse(request.responseText).host as string;
+
+ } catch (error) {
+  console.error('get host err',error)
+  return '';
+  
+ }
+}
+console.log('initial with host', getRemoteHost());
+const client = new CalendarServiceClient(getRemoteHost(), null, null)
 
 export default class CalGrid extends React.Component<{}, CalGridState> {
 
@@ -29,8 +49,8 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     weekendsVisible: true,
     currentEvents: []
   }
-  
-  async create(){
+
+  async create() {
     const req = new CreateEventRequest()
     req.setTitle("1")
     req.setLocation(new Location().setX(1).setY(1))
@@ -67,11 +87,11 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
             eventContent={renderEventContent} // custom render function
             eventClick={this.handleEventClick}
             eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
-            /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
+          /* you can update a remote database when these fire:
+          eventAdd={function(){}}
+          eventChange={function(){}}
+          eventRemove={function(){}}
+          */
           />
         </div>
       </div>
@@ -115,11 +135,31 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     })
   }
 
+  getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          console.log("position", pos);
+        },
+        () => {
+          console.log("Error", "The Geolocation service failed.")
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation
+      console.log("Error", "The Geolocation service failed.")
+    }
+  }
+
   handleDateSelect = (selectInfo: DateSelectArg) => {
     let title = prompt('Please enter a new title for your event');
 
     let calendarApi = selectInfo.view.calendar;
-    // this.create()
+    this.create()
 
     calendarApi.unselect() // clear date selection
     if (title) {
@@ -130,6 +170,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
       })
+      this.getLocation();
     }
   }
 
@@ -159,7 +200,7 @@ function renderEventContent(eventContent: EventContentArg) {
 function renderSidebarEvent(event: EventApi) {
   return (
     <li key={event.id}>
-      <b>{formatDate(event.start!, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
+      <b>{formatDate(event.start!, { year: 'numeric', month: 'short', day: 'numeric' })}</b>
       <i>{event.title}</i>
     </li>
   )
