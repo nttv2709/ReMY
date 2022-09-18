@@ -7,11 +7,13 @@ import { INITIAL_EVENTS, createEventId } from './event-utils'
 import {CalendarServiceClient} from '../api/CalendarServiceClientPb'
 import {CreateEventRequest, Location, RangeTime} from '../api/calendar_pb'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+// import { FormControl, InputLabel, Input, FormHelperText } from '@mui/material';
 
 
 // import Box from '@mui/material/Box';
 // import Button from '@mui/material/Button';
 // import Typography from '@mui/material/Typography';
+// import Dialog from '@mui/material/Dialog';
 // import Modal from '@mui/material/Modal';
 
 interface CalGridState {
@@ -19,9 +21,6 @@ interface CalGridState {
   currentEvents: EventApi[]
 }
 
-// const [open, setOpen] = React.useState(false);
-// const handleOpen = () => setOpen(true);
-// const handleClose = () => setOpen(false);
 const client = new CalendarServiceClient("http://localhost:50052", null, null)
 
 export default class CalGrid extends React.Component<{}, CalGridState> {
@@ -117,17 +116,18 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
   }
 
   handleDateSelect = (selectInfo: DateSelectArg) => {
-    let title = prompt('Please enter a new title for your event')
-    // let location = prompt('Please enter a location for your event')
-    let calendarApi = selectInfo.view.calendar
+    let title = prompt('Please enter a new title for your event');
+    let location = prompt('Please enter the location for your event');
+    
+    let calendarApi = selectInfo.view.calendar;
+    // this.create()
 
     calendarApi.unselect() // clear date selection
-
     if (title) {
       calendarApi.addEvent({
         id: createEventId(),
         title,
-        // location,
+        location,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
