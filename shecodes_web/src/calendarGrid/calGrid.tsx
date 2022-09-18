@@ -4,8 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS, createEventId } from './event-utils'
-import {CalendarServiceClient} from '../api/CalendarServiceClientPb'
-import {CreateEventRequest, Location, RangeTime} from '../api/calendar_pb'
+import { CalendarServiceClient } from '../api/CalendarServiceClientPb'
+import { CreateEventRequest, Location, RangeTime } from '../api/calendar_pb'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 // import { FormControl, InputLabel, Input, FormHelperText } from '@mui/material';
 
@@ -19,18 +19,19 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 interface CalGridState {
   weekendsVisible: boolean
   currentEvents: EventApi[]
+  currentPos: string
 }
 
 const client = new CalendarServiceClient("http://localhost:50052", null, null)
 
 export default class CalGrid extends React.Component<{}, CalGridState> {
-
   state: CalGridState = {
     weekendsVisible: true,
-    currentEvents: []
+    currentEvents: [],
+    currentPos: ""
   }
-  
-  async create(){
+
+  async create() {
     const req = new CreateEventRequest()
     req.setTitle("1")
     req.setLocation(new Location().setX(1).setY(1))
@@ -67,12 +68,23 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
             eventContent={renderEventContent} // custom render function
             eventClick={this.handleEventClick}
             eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
-            /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
+          /* you can update a remote database when these fire:
+          eventAdd={function(){}}
+          eventChange={function(){}}
+          eventRemove={function(){}}
+          */
           />
+          <select 
+          value={this.state.currentPos} 
+          onChange={this.handleSelectLocation}>
+            <option value={"10.765098712735305 106.65557228171438"} >184 Đ. Lê Đại Hành, Phường 15, Quận 11, Thành phố Hồ Chí Minh, Việt Nam</option>
+            <option value={"10.77335143652137, 106.66063629226817"}>Trường Đại học Bách khoa - Đại học Quốc gia TP.HCM</option>
+            <option value={"10.880832627089323, 106.80533378171523"}>Trường Đại học Bách Khoa - Đại học Quốc gia Thành phố Hồ Chí Minh (cơ sở 2)</option>
+            <option value={"10.75373625368853, 106.65456075110404"}>Phuc Long Cofee  Tea Express</option>
+            <option value={"10.760705483704767, 106.66339228803797"}>Sân vận động Thống Nhất</option>
+          </select>
+          <p>{`You selected ${this.state.currentPos}`}</p>
+
         </div>
       </div>
     )
@@ -108,7 +120,11 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
       </div>
     )
   }
-
+  handleSelectLocation = (e: any) => {
+    this.setState({
+      currentPos: e.target.value
+    })
+  }
   handleWeekendsToggle = () => {
     this.setState({
       weekendsVisible: !this.state.weekendsVisible
@@ -120,7 +136,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
 
     let calendarApi = selectInfo.view.calendar;
     // this.create()
-
+    let display = this.state.currentPos
     calendarApi.unselect() // clear date selection
     if (title) {
       calendarApi.addEvent({
@@ -128,10 +144,23 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
         title,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
-        allDay: selectInfo.allDay
+        allDay: selectInfo.allDay,
+        display:display//location
+      })
+      let xy = display.split(" ")
+      const req = new CreateEventRequest()
+      req.setTitle(title)
+      req.setLocation(new Location().setX(Number(xy[0])).setY(Number(xy[1])))
+      req.setRangeTime(new RangeTime().setStart(new Timestamp().setSeconds(20)).setEnd(new Timestamp().setSeconds(20)))
+      const res = client.createEvent(req, {}, (err, response) => {
+        if (err) {
+          console.log("Error:", err);
+        } else {
+          console.log("Response: ", response)
+        }
       })
     }
-  }
+  }//lf crlf
 
   handleEventClick = (clickInfo: EventClickArg) => {
     if (window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
@@ -159,8 +188,9 @@ function renderEventContent(eventContent: EventContentArg) {
 function renderSidebarEvent(event: EventApi) {
   return (
     <li key={event.id}>
-      <b>{formatDate(event.start!, {year: 'numeric', month: 'short', day: 'numeric'})}</b>
+      <b>{formatDate(event.start!, { year: 'numeric', month: 'short', day: 'numeric' })}</b>
       <i>{event.title}</i>
+      <p>{event.display}</p>
     </li>
   )
 }
