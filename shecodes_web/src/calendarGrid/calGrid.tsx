@@ -51,10 +51,10 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     currentPos: ""
   }
 
-  async create() {
+  async create(title: string,x:number,y:number) {
     const req = new CreateEventRequest()
-    req.setTitle("1")
-    req.setLocation(new Location().setX(1).setY(1))
+    req.setTitle(title)
+    req.setLocation(new Location().setX(x).setY(y))
     req.setRangeTime(new RangeTime().setStart(new Timestamp().setSeconds(20)).setEnd(new Timestamp().setSeconds(20)))
     const res = await client.createEvent(req, {}, (err, response) => {
       if (err) {
@@ -177,7 +177,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     let calendarApi = selectInfo.view.calendar;
     // this.create()
     let display = this.state.currentPos
-    // this.create()
+    
 
     calendarApi.unselect() // clear date selection
     if (title) {
@@ -190,17 +190,18 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
         display:display//location
       })
       let xy = display.split(" ")
-      const req = new CreateEventRequest()
-      req.setTitle(title)
-      req.setLocation(new Location().setX(Number(xy[0])).setY(Number(xy[1])))
-      req.setRangeTime(new RangeTime().setStart(new Timestamp().setSeconds(20)).setEnd(new Timestamp().setSeconds(20)))
-      const res = client.createEvent(req, {}, (err, response) => {
-        if (err) {
-          console.log("Error:", err);
-        } else {
-          console.log("Response: ", response)
-        }
-      })
+      this.create(title,Number(xy[0]),Number(xy[1]))
+      // req.setTitle(title)
+      // req.setLocation(new Location().setX(Number(xy[0])).setY(Number(xy[1])))
+      // req.setRangeTime(new RangeTime().setStart(new Timestamp().setSeconds(20)).setEnd(new Timestamp().setSeconds(20)))
+      // const res = client.createEvent(req, {}, (err, response) => {
+      //   if (err) {
+      //     console.log("Error:", err);
+      //   } else {
+      //     console.log("Response: ", response)
+      //   }
+      // })
+      
       this.getLocation();
     }
   }//lf crlf
