@@ -5,8 +5,9 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS, createEventId } from './event-utils'
 import { CalendarServiceClient } from '../api/CalendarServiceClientPb'
-import { CreateEventRequest, Location, RangeTime } from '../api/calendar_pb'
+import { CreateEventRequest, GetRemindRequest, Location, RangeTime } from '../api/calendar_pb'
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { triggerAsyncId } from 'async_hooks'
 // import { FormControl, InputLabel, Input, FormHelperText } from '@mui/material';
 
 
@@ -25,7 +26,7 @@ interface CalGridState {
 let map: google.maps.Map;
 
 
-const configURL = "https://raw.githubusercontent.com/nttv2709/shecodes-config/main/host.json"
+const configURL = "https://0aa8-115-73-142-201.ap.ngrok.io"
 const getRemoteHost = () => {
  try {
   const request = new XMLHttpRequest();
@@ -50,7 +51,6 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     currentEvents: [],
     currentPos: ""
   }
-
   async create(title: string,x:number,y:number) {
     const req = new CreateEventRequest()
     req.setTitle(title)
@@ -61,11 +61,40 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
         console.log("Error:", err);
       } else {
         console.log("Response: ", response)
+        
       }
     })
   }
-
+  async GetRemindRequest(x:number, y:number){
+    const req = new GetRemindRequest();
+    req.setLocation(new Location().setX(x).setY(y))
+    const res = await client.getRemind(req, {}, (err, response) => {
+      if (err) {
+        console.log("Error:", err);
+      } else {
+        console.log("Response: ", response)
+        prompt(""+(response.getDuration()), ""+response.getOkay())
+      }
+    })
+  }
   render() {
+    setTimeout(() => {      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position: GeolocationPosition) => {
+            this.GetRemindRequest(position.coords.latitude,position.coords.longitude) 
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            console.log("current position", pos);
+          },
+          () => {
+            console.log("Error", "The Geolocation service failed.")
+          }
+        );
+      }      
+    }, 1000*5*60);
     return (
       <div className='demo-app'>
         {this.renderSidebar()}
