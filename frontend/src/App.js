@@ -3,7 +3,7 @@ import 'react-calendar/dist/Calendar.css';
 import CalGrid from './component/calendarGrid/calendarGrid';
 
 import * as React from 'react';
-import Geolocation from "./component/Geolocation/geographic";
+import Area from "./component/Geolocation/geo2";
 function App() {
 
     return (
@@ -11,7 +11,7 @@ function App() {
       <>
         <Calendar/>
         <CalGrid/>
-        <Geolocation/>
+        <Area/>
       </>
     </div>
   );

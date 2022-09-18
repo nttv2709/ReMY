@@ -15,6 +15,11 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div id="map"></div>
+    <!-- Replace the value of the key parameter with your own API key. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDmV9so7qyAzZNwqJ6841N7QJxYv33aLvc&libraries=places&language=vi&region=VI&callback=initMap"
+            async defer></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.

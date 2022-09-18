@@ -1,44 +1,83 @@
-import {useEffect, useState} from "react";
+import React, {useState} from 'react';
+// import PlacesAutocomplete, {
+//     geocodeByAddress,
+//     getLatLng,
+// } from 'react-places-autocomplete';
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
-export default function Weather() {
-    const [observationalData, setObservationalData] = useState({
-        stationId: "",
-        stationName: "",
-        timestamp: 0,
-        time: "",
-        observationDate: "",
-        observationTime: "",
-        temperature: 0,
-        weather: "",
-        title: "",
-        humidity: 0,
-    });
+// class LocationSearchInput extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = { address: '' };
+//     }
+//
+//     handleChange = address => {
+//         this.setState({ address });
+//     };
+//
+//     handleSelect = address => {
+//         geocodeByAddress(address)
+//             .then(results => getLatLng(results[0]))
+//             .then(latLng => console.log('Success', latLng))
+//             .catch(error => console.error('Error', error));
+//     };
+//
+//     render() {
+//         return (
+//             <PlacesAutocomplete
+//                 value={this.state.address}
+//                 onChange={this.handleChange}
+//                 onSelect={this.handleSelect}
+//             >
+//                 {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+//                     <div>
+//                         <input
+//                             {...getInputProps({
+//                                 placeholder: 'Search Places ...',
+//                                 className: 'location-search-input',
+//                             })}
+//                         />
+//                         <div className="autocomplete-dropdown-container">
+//                             {loading && <div>Loading...</div>}
+//                             {suggestions.map(suggestion => {
+//                                 const className = suggestion.active
+//                                     ? 'suggestion-item--active'
+//                                     : 'suggestion-item';
+//                                 // inline style for demonstration purpose
+//                                 const style = suggestion.active
+//                                     ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+//                                     : { backgroundColor: '#ffffff', cursor: 'pointer' };
+//                                 return (
+//                                     <div
+//                                         {...getSuggestionItemProps(suggestion, {
+//                                             className,
+//                                             style,
+//                                         })}
+//                                     >
+//                                         <span>{suggestion.description}</span>
+//                                     </div>
+//                                 );
+//                             })}
+//                         </div>
+//                     </div>
+//                 )}
+//             </PlacesAutocomplete>
+//         );
+//     }
+// }
+const Area = () => {
+    const [value, setValue] = useState(null);
 
-    const options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0,
-    };
-
-    const getPosition = (data) => {
-        //use data to destructure
-        //setObservationalData(custom-data);
-    };
-
-    function error(err) {
-        console.warn(`ERROR(${err.code}): ${err.message}`);
-    }
-
-    useEffect(() => {
-        const timer = setInterval(getPosition, 5000);
-        console.log(new Date());
-
-        return () => {
-            clearInterval(timer);
-        };
-    });
-
-    useEffect(() => {
-        navigator.geolocation.getCurrentPosition(getPosition, error, options);
-    }, []);
+    return (
+        <div>
+            <GooglePlacesAutocomplete
+                selectProps={{
+                    value,
+                    onChange: setValue,
+                }}
+            />
+        </div>
+    );
 }
+
+export default Area;
