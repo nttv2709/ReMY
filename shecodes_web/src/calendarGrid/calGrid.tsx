@@ -22,7 +22,27 @@ interface CalGridState {
   currentPos: string
 }
 
-const client = new CalendarServiceClient("http://localhost:50052", null, null)
+let map: google.maps.Map;
+
+
+const configURL = "https://raw.githubusercontent.com/nttv2709/shecodes-config/main/host.json"
+const getRemoteHost = () => {
+ try {
+  const request = new XMLHttpRequest();
+  request.open('GET', configURL, false);  // `false` makes the request synchronous
+  request.send(null);
+
+  console.log(request.responseText);
+  return JSON.parse(request.responseText).host as string;
+
+ } catch (error) {
+  console.error('get host err',error)
+  return '';
+  
+ }
+}
+console.log('initial with host', getRemoteHost());
+const client = new CalendarServiceClient(getRemoteHost(), null, null)
 
 export default class CalGrid extends React.Component<{}, CalGridState> {
   state: CalGridState = {
@@ -131,12 +151,34 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
     })
   }
 
+  getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          console.log("position", pos);
+        },
+        () => {
+          console.log("Error", "The Geolocation service failed.")
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation
+      console.log("Error", "The Geolocation service failed.")
+    }
+  }
+
   handleDateSelect = (selectInfo: DateSelectArg) => {
     let title = prompt('Please enter a new title for your event');
 
     let calendarApi = selectInfo.view.calendar;
     // this.create()
     let display = this.state.currentPos
+    // this.create()
+
     calendarApi.unselect() // clear date selection
     if (title) {
       calendarApi.addEvent({
@@ -159,6 +201,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
           console.log("Response: ", response)
         }
       })
+      this.getLocation();
     }
   }//lf crlf
 
