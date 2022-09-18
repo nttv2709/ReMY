@@ -17,7 +17,8 @@ import (
 	"remy/pkg/ent/event"
 
 	"entgo.io/ent/dialect/sql"
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 
 	"go.uber.org/zap"
@@ -206,7 +207,7 @@ func RunGRPC() {
 		Addr:    fmt.Sprintf("0.0.0.0:%d", *constants.Port+1),
 	}
 
-	log.Printf("http server listening at %v", srv.Addr)
+	log.Printf("http server listening at %v ", srv.Addr)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.11.2
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/improbable-eng/grpc-web v0.15.0
+	github.com/lib/pq v1.10.5
 	go.uber.org/zap v1.23.0
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
