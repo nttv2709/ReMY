@@ -15,14 +15,29 @@ services:
   #-----------------------------------------------------------------
 
 
+
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: pnginx
+  #   volumes:
+  #     - ./nginx.conf/:/etc/nginx/nginx.conf
+  #   ports:
+  #     - 50054:50054
+  #     # - 50053:50053
+  #   depends_on:
+  #     - envoy
+
   envoy:
+    depends_on:
+      - remy
     build:
       context: ./proxy
       dockerfile: Dockerfile
     image: hello_lupin
     container_name: Greeter
     ports:
-      - ${PORT:-50054}:50053
+      - 50054:50053
+
   remy:
     build:
       context: .
@@ -42,6 +57,3 @@ services:
 volumes:
   db:
     driver: local
-networks:
-  samenet:
-    driver: bridge
