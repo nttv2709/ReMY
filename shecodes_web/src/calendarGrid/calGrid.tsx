@@ -117,8 +117,7 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
 
   handleDateSelect = (selectInfo: DateSelectArg) => {
     let title = prompt('Please enter a new title for your event');
-    let location = prompt('Please enter the location for your event');
-    
+
     let calendarApi = selectInfo.view.calendar;
     // this.create()
 
@@ -127,7 +126,6 @@ export default class CalGrid extends React.Component<{}, CalGridState> {
       calendarApi.addEvent({
         id: createEventId(),
         title,
-        location,
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay
